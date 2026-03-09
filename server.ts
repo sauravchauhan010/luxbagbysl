@@ -1,13 +1,14 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
-import fs from "fs";
 import { MongoClient, ObjectId } from "mongodb";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import multer from "multer";
 import cors from "cors";
 import dotenv from "dotenv";
+import { v2 as cloudinary } from "cloudinary";
+import { Readable } from "stream";
 
 dotenv.config({ path: ".env.local" });
 dotenv.config();
@@ -17,18 +18,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
 
-if (!fs.existsSync("uploads")) {
-  fs.mkdirSync("uploads");
-}
+// Multer — store in memory (not disk), then upload to Cloudinary
+const upload = multer({ storage: multer.memoryStorage() });
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
-});
-const upload = multer({ storage });
-
+// Auth Middleware
 const authenticateToken = (req: any, res: any, next: any) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -40,31 +34,51 @@ const authenticateToken = (req: any, res: any, next: any) => {
   });
 };
 
+// Upload a single file buffer to Cloudinary
+function uploadToCloudinary(buffer: Buffer, filename: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: "luxbag", public_id: `${Date.now()}-${filename}`, resource_type: "image" },
+      (error, result) => {
+        if (error || !result) return reject(error);
+        resolve(result.secure_url);
+      }
+    );
+    Readable.from(buffer).pipe(uploadStream);
+  });
+}
+
 async function startServer() {
+  // ── MongoDB ───────────────────────────────────────────────────
   const mongoUri = process.env.MONGODB_URI;
-  if (!mongoUri) {
-    console.error("MONGODB_URI is not set!");
-    process.exit(1);
-  }
+  if (!mongoUri) { console.error("MONGODB_URI is not set!"); process.exit(1); }
 
   const client = new MongoClient(mongoUri);
   await client.connect();
-  console.log("Connected to MongoDB Atlas");
+  console.log("✅ Connected to MongoDB Atlas");
 
   const database = client.db("luxbag");
   const productsCol = database.collection("products");
   const settingsCol = database.collection("settings");
   const adminsCol = database.collection("admins");
 
-  // Seed Admin
+  // ── Cloudinary ────────────────────────────────────────────────
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+  console.log("✅ Cloudinary configured");
+
+  // ── Seed Admin ────────────────────────────────────────────────
   const existingAdmin = await adminsCol.findOne({ username: "admin" });
   if (!existingAdmin) {
     const hashedPassword = bcrypt.hashSync("password123", 10);
     await adminsCol.insertOne({ username: "admin", password: hashedPassword });
-    console.log("Admin created: username=admin password=password123");
+    console.log("✅ Admin created: username=admin password=password123");
   }
 
-  // Seed Settings
+  // ── Seed Settings ─────────────────────────────────────────────
   const settingsCount = await settingsCol.countDocuments();
   if (settingsCount === 0) {
     await settingsCol.insertMany([
@@ -75,7 +89,7 @@ async function startServer() {
     ]);
   }
 
-  // Seed Sample Products
+  // ── Seed Sample Products ──────────────────────────────────────
   const productCount = await productsCol.countDocuments();
   if (productCount === 0) {
     await productsCol.insertMany([
@@ -86,10 +100,12 @@ async function startServer() {
       { product_name: "Hermes Oran Sandals Gold", price: 2800, condition: "New", category: "Footwear", size: "EU 38", is_curated: 0, description: "Iconic Oran sandals in Epsom calfskin. A summer essential.", product_id: "H-ORAN-GLD", images: ["https://images.unsplash.com/photo-1603191659812-ee978eeeef76?auto=format&fit=crop&q=80&w=800"], is_active: 1, created_at: new Date() },
       { product_name: "Chanel Slingback Pumps", price: 4500, condition: "New", category: "Footwear", size: "EU 37.5", is_curated: 0, description: "Classic slingbacks in beige and black lambskin. Timeless elegance.", product_id: "CH-SLING-BEG", images: ["https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&q=80&w=800"], is_active: 1, created_at: new Date() },
     ]);
-    console.log("Sample products seeded");
+    console.log("✅ Sample products seeded");
   }
 
   const fmt = (p: any) => ({ ...p, id: p._id.toString(), _id: undefined });
+
+  // ── API Routes ────────────────────────────────────────────────
 
   // Admin Login
   app.post("/api/admin/login", async (req, res) => {
@@ -120,24 +136,47 @@ async function startServer() {
     } catch { res.status(400).json({ message: "Invalid product ID" }); }
   });
 
-  // Create Product
+  // Create Product — images go to Cloudinary
   app.post("/api/products", authenticateToken, upload.array("images"), async (req: any, res) => {
     const { product_name, price, condition, category, size, is_curated, description, product_id, is_active } = req.body;
     if (!product_name || !price || !product_id) return res.status(400).json({ message: "Product name, price, and product ID are required" });
     const existing = await productsCol.findOne({ product_id });
     if (existing) return res.status(400).json({ message: "Product ID already exists." });
-    const imagesArr = (req.files as any[] || []).map((f: any) => `/uploads/${f.filename}`);
-    const result = await productsCol.insertOne({ product_name, price: parseFloat(price), condition, category: category || "Bags", size, is_curated: parseInt(is_curated || 0), description, product_id, images: imagesArr, is_active: is_active === undefined ? 1 : parseInt(is_active), created_at: new Date() });
+
+    // Upload each image to Cloudinary
+    const imageUrls: string[] = [];
+    for (const file of (req.files as any[] || [])) {
+      const url = await uploadToCloudinary(file.buffer, file.originalname);
+      imageUrls.push(url);
+    }
+
+    const result = await productsCol.insertOne({
+      product_name, price: parseFloat(price), condition,
+      category: category || "Bags", size,
+      is_curated: parseInt(is_curated || 0), description, product_id,
+      images: imageUrls,
+      is_active: is_active === undefined ? 1 : parseInt(is_active),
+      created_at: new Date(),
+    });
     res.status(201).json({ id: result.insertedId.toString() });
   });
 
-  // Update Product
+  // Update Product — new images go to Cloudinary
   app.put("/api/products/:id", authenticateToken, upload.array("images"), async (req: any, res) => {
     const { product_name, price, condition, category, size, is_curated, description, product_id, existing_images, is_active } = req.body;
     let imagesArr = JSON.parse(existing_images || "[]");
-    if (req.files && (req.files as any[]).length > 0) imagesArr = [...imagesArr, ...(req.files as any[]).map((f: any) => `/uploads/${f.filename}`)];
+
+    // Upload new images to Cloudinary
+    for (const file of (req.files as any[] || [])) {
+      const url = await uploadToCloudinary(file.buffer, file.originalname);
+      imagesArr.push(url);
+    }
+
     try {
-      await productsCol.updateOne({ _id: new ObjectId(req.params.id) }, { $set: { product_name, price: parseFloat(price), condition, category, size, is_curated: parseInt(is_curated || 0), description, product_id, images: imagesArr, is_active: parseInt(is_active) } });
+      await productsCol.updateOne(
+        { _id: new ObjectId(req.params.id) },
+        { $set: { product_name, price: parseFloat(price), condition, category, size, is_curated: parseInt(is_curated || 0), description, product_id, images: imagesArr, is_active: parseInt(is_active) } }
+      );
       res.json({ message: "Product updated" });
     } catch (error: any) { res.status(400).json({ message: error.message }); }
   });
@@ -181,7 +220,7 @@ async function startServer() {
     app.get("*", (req, res) => res.sendFile(path.resolve("dist/index.html")));
   }
 
-  app.listen(PORT, "0.0.0.0", () => console.log(`Server running on http://localhost:${PORT}`));
+  app.listen(PORT, "0.0.0.0", () => console.log(`🚀 Server running on http://localhost:${PORT}`));
 }
 
 startServer().catch((err) => { console.error("Failed to start:", err); process.exit(1); });
