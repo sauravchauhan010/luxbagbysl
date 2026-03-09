@@ -37,7 +37,7 @@ const Navbar = () => {
               transition={{ duration: 0.8 }}
               src="https://scontent.fdxb3-3.fna.fbcdn.net/v/t39.30808-1/461331705_511393141656498_7949530645421016791_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=107&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=-Ru6uhhmNUkQ7kNvwFjXhVY&_nc_oc=AdnJc5sBNj7HnUwv_aBDluEEVU83ipsFAk7bc1b4TN6w5Ygvm5R9i8OAYjTvptALkkP36JgUVYbj9XyDZl7mkMqu&_nc_zt=24&_nc_ht=scontent.fdxb3-3.fna&_nc_gid=zgRXcOGL4CjHaLBEQpdHeg&_nc_ss=8&oh=00_AfyKqDXsaXU6KdGo6UMJU8pBtGQY7NkJj3QQfIni8Wxokg&oe=69B49233" 
               alt="Lux Bag Logo" 
-              className="h-24 w-40 rounded-full object-cover border border-gold/20 group-hover:border-gold"
+              className="h-10 w-10 rounded-full object-cover border border-gold/20 group-hover:border-gold"
               referrerPolicy="no-referrer"
             />
             <div className="flex flex-col">
