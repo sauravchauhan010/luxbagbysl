@@ -89,7 +89,7 @@ async function startServer() {
     console.log("Sample products seeded");
   }
 
-  // Admin Login
+   // Admin Login
   app.post("/api/admin/login", async (req, res) => {
     const { username, password } = req.body;
     const admin = await adminsCol.findOne({ username }) as any;
