@@ -9,9 +9,7 @@ const Navbar = () => {
   const location = useLocation();
 
   React.useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -25,24 +23,38 @@ const Navbar = () => {
 
   return (
     <nav className={`sticky top-0 z-50 transition-all duration-500 ${
-      scrolled 
-        ? 'bg-white/90 backdrop-blur-lg border-b border-gray-100 py-2 luxury-shadow' 
-        : 'bg-white/50 backdrop-blur-sm border-b border-transparent py-4'
+      scrolled
+        ? 'bg-white/90 backdrop-blur-lg border-b border-gray-100 luxury-shadow'
+        : 'bg-white/50 backdrop-blur-sm border-b border-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          <Link to="/" className="flex items-center space-x-3 group">
-            <motion.img 
+        <div className="flex justify-between items-center h-20">
+
+          {/* Logo — overflows navbar like image 3 */}
+          <Link to="/" className="flex items-center space-x-3 group" style={{ overflow: 'visible' }}>
+            <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.8 }}
-              src="https://scontent.fdxb3-3.fna.fbcdn.net/v/t39.30808-1/461331705_511393141656498_7949530645421016791_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=107&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=-Ru6uhhmNUkQ7kNvwFjXhVY&_nc_oc=AdnJc5sBNj7HnUwv_aBDluEEVU83ipsFAk7bc1b4TN6w5Ygvm5R9i8OAYjTvptALkkP36JgUVYbj9XyDZl7mkMqu&_nc_zt=24&_nc_ht=scontent.fdxb3-3.fna&_nc_gid=zgRXcOGL4CjHaLBEQpdHeg&_nc_ss=8&oh=00_AfyKqDXsaXU6KdGo6UMJU8pBtGQY7NkJj3QQfIni8Wxokg&oe=69B49233" 
-              alt="Lux Bag Logo" 
-              className="h-20 w-20 rounded-full object-cover border border-gold/20 group-hover:border-gold"
-              referrerPolicy="no-referrer"
-            />
+              style={{
+                width: 96, height: 96,
+                marginTop: 16,
+                flexShrink: 0,
+                borderRadius: '50%',
+                overflow: 'hidden',
+                border: '2px solid #C9A84C',
+                boxShadow: '0 4px 20px rgba(201,168,76,0.2)',
+              }}
+            >
+              <img
+                src="https://scontent.fdxb3-3.fna.fbcdn.net/v/t39.30808-1/461331705_511393141656498_7949530645421016791_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=107&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=-Ru6uhhmNUkQ7kNvwFjXhVY&_nc_oc=AdnJc5sBNj7HnUwv_aBDluEEVU83ipsFAk7bc1b4TN6w5Ygvm5R9i8OAYjTvptALkkP36JgUVYbj9XyDZl7mkMqu&_nc_zt=24&_nc_ht=scontent.fdxb3-3.fna&_nc_gid=zgRXcOGL4CjHaLBEQpdHeg&_nc_ss=8&oh=00_AfyKqDXsaXU6KdGo6UMJU8pBtGQY7NkJj3QQfIni8Wxokg&oe=69B49233"
+                alt="Lux Bag Logo"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                referrerPolicy="no-referrer"
+              />
+            </motion.div>
             <div className="flex flex-col">
-              <span className="text-xl font-display tracking-tighter font-bold leading-none group-hover:text-gold transition-colors">LUX BAG</span>
-              <span className="text-[9px] uppercase tracking-[0.3em] text-gold mt-1 font-medium">by S & L</span>
+              <span className="text-2xl font-display tracking-tighter font-bold leading-none group-hover:text-gold transition-colors">LUX BAG</span>
+              <span className="text-[10px] uppercase tracking-[0.3em] text-gold mt-1 font-medium">by S & L</span>
             </div>
           </Link>
 
@@ -66,14 +78,11 @@ const Navbar = () => {
 
           <div className="flex items-center space-x-4">
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Link to="/shop" className="p-2 hover:text-gold transition-colors relative">
-                <ShoppingBag size={18} />
+              <Link to="/shop" className="p-2 hover:text-gold transition-colors">
+                <ShoppingBag size={20} />
               </Link>
             </motion.div>
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 hover:text-gold transition-colors"
-            >
+            <button onClick={() => setIsOpen(!isOpen)} className="md:hidden p-2 hover:text-gold transition-colors">
               {isOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
