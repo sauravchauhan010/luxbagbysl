@@ -2,20 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { useAppContext } from '../AppContext';
-import { ShieldCheck, RefreshCw, Award, ArrowRight, ShoppingBag } from 'lucide-react';
+import { ShieldCheck, ArrowRight, ShoppingBag, Star, Truck, Lock } from 'lucide-react';
 
 const Home = () => {
   const { products } = useAppContext();
   const featuredProducts = products.filter(p => p.is_curated === 1).slice(0, 4);
-  
-  // Fallback if no curated products
   const displayProducts = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 4);
 
   return (
     <div className="space-y-24 pb-24">
+
       {/* Hero Section */}
-      <section className="relative h-[90vh] flex items-center justify-center overflow-hidden perspective-1000">
-        <motion.div 
+      <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
+        <motion.div
           initial={{ scale: 1.2, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
@@ -28,17 +27,14 @@ const Home = () => {
             referrerPolicy="no-referrer"
           />
         </motion.div>
-        
+
         <div className="relative z-10 text-center text-white px-4 space-y-6">
           <motion.div
-            initial={{ opacity: 0, rotateX: -45, y: 50 }}
-            animate={{ opacity: 1, rotateX: 0, y: 0 }}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="preserve-3d"
           >
-            <p className="uppercase tracking-widest text-sm font-bold mb-4 text-gold">
-              Exquisite Collection
-            </p>
+            <p className="uppercase tracking-widest text-sm font-bold mb-4 text-gold">Exquisite Collection</p>
             <h1 className="text-6xl md:text-9xl font-display tracking-tighter leading-none mb-8 font-bold">
               Elevate <br className="md:hidden" /> Your Style
             </h1>
@@ -53,28 +49,47 @@ const Home = () => {
           </motion.div>
         </div>
 
-        {/* Floating Elements for 3D depth */}
-        <motion.div 
-          animate={{ 
-            y: [0, -20, 0],
-            rotate: [0, 5, 0]
-          }}
+        <motion.div
+          animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-1/4 left-10 w-32 h-32 border border-gold/20 rounded-full hidden lg:block"
         />
-        <motion.div 
-          animate={{ 
-            y: [0, 20, 0],
-            rotate: [0, -5, 0]
-          }}
+        <motion.div
+          animate={{ y: [0, 20, 0], rotate: [0, -5, 0] }}
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
           className="absolute bottom-1/4 right-10 w-48 h-48 border border-white/10 rounded-full hidden lg:block"
         />
       </section>
 
+      {/* Trust Badges */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { icon: <ShieldCheck size={28} />, title: '100% Authentic', desc: 'Every piece verified and authenticated by our luxury experts' },
+            { icon: <Truck size={28} />, title: 'Fast Delivery', desc: 'Secure and insured delivery across the UAE and worldwide' },
+            { icon: <Lock size={28} />, title: 'Secure Purchase', desc: 'Safe & encrypted transactions. Your privacy is our priority' },
+          ].map((item, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="flex items-start gap-5 p-6 border border-gray-100 hover:border-gold/30 transition-colors group"
+            >
+              <div className="text-gold flex-shrink-0 mt-1 group-hover:scale-110 transition-transform">{item.icon}</div>
+              <div>
+                <h4 className="font-bold uppercase tracking-widest text-xs mb-2">{item.title}</h4>
+                <p className="text-gray-400 text-sm font-light leading-relaxed">{item.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* Featured Products */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -90,7 +105,7 @@ const Home = () => {
           </Link>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {displayProducts.map((product, index) => (
             <motion.div
               key={product.id}
@@ -98,40 +113,48 @@ const Home = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.6 }}
-              whileHover={{ 
-                y: -15,
-                rotateY: 5,
-                rotateX: -5,
-                transition: { duration: 0.3 }
-              }}
-              className="group perspective-1000"
+              className="group"
             >
-              <Link to={`/product/${product.id}`} className="block preserve-3d">
-                <div className="aspect-[4/5] overflow-hidden bg-white mb-6 relative luxury-shadow border border-gray-100 group-hover:border-gold/30 transition-colors">
+              <Link to={`/product/${product.id}`} className="block">
+                {/* Image Container */}
+                <div className="relative overflow-hidden bg-gray-50 mb-4" style={{ aspectRatio: '4/5' }}>
                   <img
                     src={product.images[0] || 'https://via.placeholder.com/400x500'}
                     alt={product.product_name}
-                    className="w-full h-full object-contain transition-transform duration-1000 group-hover:scale-110 p-6"
+                    className="w-full h-full object-contain p-6 transition-transform duration-700 group-hover:scale-105"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute top-4 left-4 z-10 flex flex-col space-y-2">
-                    <span className="bg-luxury-black text-white px-3 py-1 text-[9px] uppercase tracking-widest font-bold">
+
+                  {/* Badges */}
+                  <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+                    <span className={`px-2.5 py-1 text-[9px] uppercase tracking-widest font-bold ${product.condition === 'New' ? 'bg-luxury-black text-white' : 'bg-gold text-luxury-black'}`}>
                       {product.condition}
                     </span>
-                    <span className="bg-gold text-luxury-black px-3 py-1 text-[9px] uppercase tracking-widest font-bold">
-                      {product.category}
+                    {product.is_curated === 1 && (
+                      <span className="bg-white text-gold px-2.5 py-1 text-[9px] uppercase tracking-widest font-bold flex items-center gap-1 shadow-sm">
+                        <Star size={8} fill="currentColor" /> Curated
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Hover overlay with quick action */}
+                  <div className="absolute inset-0 bg-luxury-black/0 group-hover:bg-luxury-black/10 transition-all duration-500" />
+                  <div className="absolute bottom-0 left-0 right-0 bg-luxury-black text-white py-3 text-center text-[10px] uppercase tracking-widest font-bold translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    <span className="flex items-center justify-center gap-2">
+                      <ShoppingBag size={12} /> View Details
                     </span>
                   </div>
-                  {/* Overlay effect */}
-                  <div className="absolute inset-0 bg-luxury-black/0 group-hover:bg-luxury-black/5 transition-colors duration-500" />
                 </div>
-                <div className="space-y-2 transform group-hover:translate-z-10">
-                  <h3 className="text-sm uppercase tracking-widest font-bold group-hover:text-gold transition-colors">{product.product_name}</h3>
-                  <div className="flex items-center space-x-2">
+
+                {/* Info */}
+                <div className="space-y-2 px-1">
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-medium">{product.category}</p>
+                  <h3 className="text-sm font-bold leading-tight group-hover:text-gold transition-colors line-clamp-2">{product.product_name}</h3>
+                  <div className="flex items-baseline gap-2 pt-1">
                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">AED</span>
-                    <p className="text-luxury-black font-display text-2xl font-bold tracking-tight">
+                    <span className="font-display text-2xl font-bold tracking-tight text-luxury-black">
                       {product.price.toLocaleString()}
-                    </p>
+                    </span>
                   </div>
                 </div>
               </Link>
@@ -140,54 +163,40 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Buy Sell Consign Section */}
+      {/* Why Buy From Us — single column, focused on buying */}
       <section className="bg-luxury-black text-white py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="space-y-4"
-            >
-              <div className="w-16 h-16 border border-gold rounded-full flex items-center justify-center mx-auto mb-6">
-                <ShoppingBag className="text-gold" size={24} />
-              </div>
-              <h3 className="text-2xl font-display">Buy</h3>
-              <p className="text-gray-400 text-sm font-light leading-relaxed">
-                Discover our curated collection of 100% authentic luxury bags from world-renowned brands.
-              </p>
-            </motion.div>
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="space-y-4"
-            >
-              <div className="w-16 h-16 border border-gold rounded-full flex items-center justify-center mx-auto mb-6">
-                <RefreshCw className="text-gold" size={24} />
-              </div>
-              <h3 className="text-2xl font-display">Sell</h3>
-              <p className="text-gray-400 text-sm font-light leading-relaxed">
-                Turn your luxury items into cash. We offer competitive prices for your preloved designer bags.
-              </p>
-            </motion.div>
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="space-y-4"
-            >
-              <div className="w-16 h-16 border border-gold rounded-full flex items-center justify-center mx-auto mb-6">
-                <Award className="text-gold" size={24} />
-              </div>
-              <h3 className="text-2xl font-display">Consign</h3>
-              <p className="text-gray-400 text-sm font-light leading-relaxed">
-                Let us handle the selling for you. Reach a wide audience of luxury enthusiasts through our platform.
-              </p>
-            </motion.div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="space-y-6 mb-16"
+          >
+            <p className="text-gold uppercase tracking-widest text-xs">Why Choose Us</p>
+            <h2 className="text-4xl md:text-5xl font-display">The Lux Bag Experience</h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {[
+              { icon: <ShieldCheck size={28} />, title: 'Authenticated', desc: 'Every bag is rigorously inspected and verified for 100% authenticity before listing.' },
+              { icon: <Star size={28} />, title: 'Curated Collection', desc: 'Hand-picked luxury pieces from the world\'s most coveted brands — Hermès, Chanel, Louis Vuitton and more.' },
+              { icon: <ShoppingBag size={28} />, title: 'Exclusive Access', desc: 'Discover rare and limited-edition pieces you won\'t find anywhere else in the UAE.' },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="space-y-4"
+              >
+                <div className="w-16 h-16 border border-gold rounded-full flex items-center justify-center mx-auto text-gold">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-display">{item.title}</h3>
+                <p className="text-gray-400 text-sm font-light leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -204,6 +213,10 @@ const Home = () => {
               <ShieldCheck size={32} />
               <span className="uppercase tracking-widest text-xs font-semibold">Verified Authentic</span>
             </div>
+            <Link to="/shop" className="btn-luxury inline-flex items-center space-x-3">
+              <span>Shop Now</span>
+              <ArrowRight size={16} />
+            </Link>
           </div>
           <div className="flex-1">
             <img
@@ -221,7 +234,7 @@ const Home = () => {
         <div className="max-w-3xl mx-auto px-4 space-y-8">
           <h2 className="text-4xl font-display">Have a Question?</h2>
           <p className="text-gray-500 font-light">
-            Our luxury consultants are available to assist you with any inquiries regarding our collection, selling, or consignment.
+            Our luxury consultants are available to assist you with any inquiries about our collection.
           </p>
           <a
             href="https://wa.me/971505876447"
@@ -229,7 +242,7 @@ const Home = () => {
             rel="noopener noreferrer"
             className="btn-luxury inline-flex items-center space-x-3"
           >
-            <span>Inquire via WhatsApp</span>
+            <span>Chat with Us on WhatsApp</span>
             <ArrowRight size={16} />
           </a>
         </div>
