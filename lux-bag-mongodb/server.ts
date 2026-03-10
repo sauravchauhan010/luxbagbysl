@@ -56,12 +56,12 @@ async function startServer() {
   const settingsCol = database.collection("settings");
   const adminsCol = database.collection("admins");
 
-  // Seed Admin
+   // ── Seed Admin ────────────────────────────────────────────────
   const existingAdmin = await adminsCol.findOne({ username: "admin" });
   if (!existingAdmin) {
     const hashedPassword = bcrypt.hashSync("password123", 10);
     await adminsCol.insertOne({ username: "admin", password: hashedPassword });
-    console.log("Admin created: username=admin password=password123");
+    console.log("✅ Admin created: username=admin password=password123");
   }
 
   // Seed Settings
