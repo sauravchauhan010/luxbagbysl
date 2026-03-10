@@ -9,8 +9,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { v2 as cloudinary } from "cloudinary";
 import { Readable } from "stream";
-import nodemailer from "nodemailer";
-import crypto from "crypto";
 
 dotenv.config({ path: ".env.local" });
 dotenv.config();
@@ -44,17 +42,6 @@ function uploadToCloudinary(buffer: Buffer, filename: string): Promise<string> {
       }
     );
     Readable.from(buffer).pipe(uploadStream);
-  });
-}
-
-// Email transporter (Gmail)
-function createTransporter() {
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
   });
 }
 
@@ -134,90 +121,6 @@ async function startServer() {
   });
 
   // ── FORGOT PASSWORD — send reset email ────────────────────────
-  app.post("/api/admin/forgot-password", async (req, res) => {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ message: "Email is required" });
-
-    const admin = await adminsCol.findOne({ email: email.toLowerCase().trim() }) as any;
-
-    // Always return success (don't reveal if email exists)
-    if (!admin) {
-      return res.json({ message: "If that email exists, a reset link has been sent." });
-    }
-
-    // Generate secure token
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-    await adminsCol.updateOne(
-      { _id: admin._id },
-      { $set: { resetToken, resetTokenExpiry } }
-    );
-
-    const resetUrl = `${process.env.SITE_URL || "https://luxbagbysl.site"}/admin/reset-password?token=${resetToken}`;
-
-    try {
-      const transporter = createTransporter();
-      await transporter.sendMail({
-        from: `"Lux Bag Admin" <${process.env.GMAIL_USER}>`,
-        to: admin.email,
-        subject: "Reset Your Admin Password — Lux Bag by S and L",
-        html: `
-          <div style="font-family: Georgia, serif; max-width: 480px; margin: 0 auto; padding: 40px 20px; background: #fff;">
-            <div style="text-align: center; margin-bottom: 32px;">
-              <h1 style="font-size: 24px; letter-spacing: 4px; color: #1a1a1a; margin: 0;">LUX BAG</h1>
-              <p style="font-size: 10px; letter-spacing: 3px; color: #C9A84C; margin: 4px 0 0;">BY S & L</p>
-            </div>
-            <hr style="border: none; border-top: 1px solid #eee; margin-bottom: 32px;" />
-            <h2 style="font-size: 18px; color: #1a1a1a; margin-bottom: 12px;">Password Reset Request</h2>
-            <p style="color: #666; font-size: 14px; line-height: 1.6;">
-              We received a request to reset your admin password. Click the button below to set a new password.
-              This link expires in <strong>1 hour</strong>.
-            </p>
-            <div style="text-align: center; margin: 32px 0;">
-              <a href="${resetUrl}"
-                style="background: #1a1a1a; color: #fff; text-decoration: none; padding: 14px 36px; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; font-weight: bold; display: inline-block;">
-                Reset Password
-              </a>
-            </div>
-            <p style="color: #999; font-size: 12px; line-height: 1.6;">
-              If you didn't request this, you can safely ignore this email. Your password won't change.
-            </p>
-            <hr style="border: none; border-top: 1px solid #eee; margin-top: 32px;" />
-            <p style="color: #ccc; font-size: 11px; text-align: center;">Lux Bag by S and L · Dubai, UAE</p>
-          </div>
-        `,
-      });
-      console.log("✅ Reset email sent to:", admin.email);
-    } catch (err) {
-      console.error("❌ Email send failed:", err);
-      return res.status(500).json({ message: "Failed to send email. Please check email config." });
-    }
-
-    res.json({ message: "If that email exists, a reset link has been sent." });
-  });
-
-  // ── RESET PASSWORD — verify token & set new password ──────────
-  app.post("/api/admin/reset-password", async (req, res) => {
-    const { token, newPassword } = req.body;
-    if (!token || !newPassword) return res.status(400).json({ message: "Token and new password are required" });
-    if (newPassword.length < 6) return res.status(400).json({ message: "Password must be at least 6 characters" });
-
-    const admin = await adminsCol.findOne({
-      resetToken: token,
-      resetTokenExpiry: { $gt: new Date() },
-    }) as any;
-
-    if (!admin) return res.status(400).json({ message: "Invalid or expired reset link. Please request a new one." });
-
-    const hashed = bcrypt.hashSync(newPassword, 10);
-    await adminsCol.updateOne(
-      { _id: admin._id },
-      { $set: { password: hashed, resetToken: null, resetTokenExpiry: null } }
-    );
-
-    res.json({ message: "Password reset successfully! You can now log in." });
-  });
 
   // ── CHANGE PASSWORD (logged in) ────────────────────────────────
   app.put("/api/admin/change-password", authenticateToken, async (req: any, res) => {
