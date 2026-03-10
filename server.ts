@@ -324,8 +324,13 @@ async function startServer() {
   // Helper: extract Cloudinary public_id from URL
   function getCloudinaryPublicId(url: string): string | null {
     try {
-      const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/i);
-      return match ? match[1] : null;
+      // URL format: .../upload/v1234567890/luxbag/filename.ext
+      // We need everything after /upload/vXXXXXX/ and strip only the LAST extension
+      const match = url.match(/\/upload\/(?:v\d+\/)?(.+)$/i);
+      if (!match) return null;
+      // Strip only the last extension (e.g. .png from filename.png.png → filename.png)
+      const withoutLastExt = match[1].replace(/\.[^.]+$/, "");
+      return withoutLastExt;
     } catch { return null; }
   }
 
