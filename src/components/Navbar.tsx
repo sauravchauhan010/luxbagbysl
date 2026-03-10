@@ -22,7 +22,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-500 ${
+    <nav className={`sticky top-0 z-50 transition-all duration-500 overflow-visible ${
       scrolled
         ? 'bg-white/90 backdrop-blur-lg border-b border-gray-100 luxury-shadow'
         : 'bg-white/50 backdrop-blur-sm border-b border-transparent'
@@ -31,18 +31,21 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-20">
 
           {/* Logo — overflows navbar like image 3 */}
-          <Link to="/" className="flex items-center space-x-3 group" style={{ overflow: 'visible' }}>
+          <Link to="/" className="flex items-center space-x-3 group" style={{ overflow: 'visible', position: 'relative' }}>
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.8 }}
               style={{
-                width: 96, height: 96,
-                marginTop: 16,
+                width: 120, height: 120,
+                position: 'relative',
+                top: 20,
                 flexShrink: 0,
                 borderRadius: '50%',
                 overflow: 'hidden',
-                border: '2px solid #C9A84C',
-                boxShadow: '0 4px 20px rgba(201,168,76,0.2)',
+                border: '3px solid #C9A84C',
+                boxShadow: '0 8px 30px rgba(201,168,76,0.25)',
+                background: 'white',
+                zIndex: 60,
               }}
             >
               <img
