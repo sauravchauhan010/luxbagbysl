@@ -161,10 +161,26 @@ async function startServer() {
     res.status(201).json({ id: result.insertedId.toString() });
   });
 
-  // Update Product — new images go to Cloudinary
+  // Update Product — new images go to Cloudinary, removed images deleted from Cloudinary
   app.put("/api/products/:id", authenticateToken, upload.array("images"), async (req: any, res) => {
     const { product_name, price, condition, category, size, is_curated, description, product_id, existing_images, is_active } = req.body;
     let imagesArr = JSON.parse(existing_images || "[]");
+
+    // Delete removed images from Cloudinary
+    try {
+      const currentProduct = await productsCol.findOne({ _id: new ObjectId(req.params.id) }) as any;
+      if (currentProduct && currentProduct.images) {
+        const removedImages = currentProduct.images.filter((url: string) => !imagesArr.includes(url));
+        for (const imageUrl of removedImages) {
+          if (imageUrl.includes("res.cloudinary.com")) {
+            const publicId = getCloudinaryPublicId(imageUrl);
+            if (publicId) {
+              try { await cloudinary.uploader.destroy(publicId); } catch {}
+            }
+          }
+        }
+      }
+    } catch {}
 
     // Upload new images to Cloudinary
     for (const file of (req.files as any[] || [])) {
@@ -181,9 +197,37 @@ async function startServer() {
     } catch (error: any) { res.status(400).json({ message: error.message }); }
   });
 
-  // Delete Product
+  // Helper: extract Cloudinary public_id from URL
+  function getCloudinaryPublicId(url: string): string | null {
+    try {
+      const match = url.match(/\/upload\/(?:v\d+\/)?(.+)$/i);
+      if (!match) return null;
+      return match[1].replace(/\.[^.]+$/, "");
+    } catch { return null; }
+  }
+
+  // Delete Product + Cloudinary images
   app.delete("/api/products/:id", authenticateToken, async (req, res) => {
     try {
+      const product = await productsCol.findOne({ _id: new ObjectId(req.params.id) }) as any;
+      if (!product) return res.status(404).json({ message: "Product not found" });
+
+      if (product.images && product.images.length > 0) {
+        for (const imageUrl of product.images) {
+          if (imageUrl.includes("res.cloudinary.com")) {
+            const publicId = getCloudinaryPublicId(imageUrl);
+            if (publicId) {
+              try {
+                await cloudinary.uploader.destroy(publicId);
+                console.log("Deleted from Cloudinary: " + publicId);
+              } catch (err) {
+                console.error("Failed to delete from Cloudinary:", err);
+              }
+            }
+          }
+        }
+      }
+
       await productsCol.deleteOne({ _id: new ObjectId(req.params.id) });
       res.json({ message: "Product deleted" });
     } catch { res.status(400).json({ message: "Invalid product ID" }); }
