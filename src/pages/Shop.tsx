@@ -35,7 +35,7 @@ const Shop = () => {
     if (sortBy === 'price-desc') result.sort((a, b) => b.price - a.price);
 
     return result;
-  }, [products, searchQuery, activeCategory, activeCondition, sortBy]);
+  }, [products, searchQuery, activeCategory, sortBy]);
 
   if (loading) {
     return (
@@ -202,7 +202,7 @@ const Shop = () => {
           >
             <p className="text-gray-400 font-light text-sm mb-2">No products found</p>
             <button
-              onClick={() => { setSearchQuery(''); setActiveCategory('All'); setActiveCondition('All'); setSortBy('default'); }}
+              onClick={() => { setSearchQuery(''); setActiveCategory('All'); setSortBy('default'); }}
               className="text-[10px] uppercase tracking-widest font-bold text-gold hover:underline mt-2"
             >
               Clear all filters
