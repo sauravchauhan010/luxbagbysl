@@ -7,7 +7,6 @@ import { Search, X, ChevronDown } from 'lucide-react';
 const Shop = () => {
   const { products, loading } = useAppContext();
   const [activeCategory, setActiveCategory] = useState<'All' | 'Bags' | 'Footwear'>('All');
-  const [activeCondition, setActiveCondition] = useState<'All' | 'New' | 'Preloved'>('All');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOpen, setSortOpen] = useState(false);
@@ -30,9 +29,6 @@ const Shop = () => {
 
     // Category filter
     if (activeCategory !== 'All') result = result.filter(p => p.category === activeCategory);
-
-    // Condition filter
-    if (activeCondition !== 'All') result = result.filter(p => p.condition === activeCondition);
 
     // Sort
     if (sortBy === 'price-asc') result.sort((a, b) => a.price - b.price);
@@ -99,25 +95,6 @@ const Shop = () => {
             ))}
           </div>
 
-          {/* Divider */}
-          <div className="w-px bg-gray-200 hidden sm:block" />
-
-          {/* Condition */}
-          <div className="flex gap-1">
-            {(['All', 'New', 'Preloved'] as const).map(cond => (
-              <button
-                key={cond}
-                onClick={() => setActiveCondition(cond)}
-                className={`px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold border transition-all ${
-                  activeCondition === cond
-                    ? 'bg-gold text-luxury-black border-gold'
-                    : 'bg-white text-gray-400 border-gray-200 hover:border-gold hover:text-gold'
-                }`}
-              >
-                {cond}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Sort dropdown */}
