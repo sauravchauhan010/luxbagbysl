@@ -40,8 +40,10 @@ const Home = () => {
           >
             <p className="uppercase tracking-widest text-sm font-bold mb-4 text-gold">Exquisite Collection</p>
             <h1 className="text-6xl md:text-9xl font-display tracking-tighter leading-none mb-8 font-bold">
-              Elevate <br className="md:hidden" /> Your Style Eith S & L
-            </h1>
+  Elevate <br className="md:hidden" />
+  Your Style with <br />
+  S & L
+</h1>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 pt-8">
               <Link to="/shop" className="btn-gold px-12 py-4 text-sm font-bold hover:scale-105 transition-transform">
                 Explore Collection
