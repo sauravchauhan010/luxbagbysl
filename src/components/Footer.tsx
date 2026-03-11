@@ -66,7 +66,7 @@ const Footer = () => {
           </p>
           <p className="text-[9px] text-gray-700 uppercase tracking-widest">
             Designed & Developed by{' '}
-            <a href="https://instagram.com/the_volleydrum" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-white transition-colors">
+            <a href="https://instagram.com/the_volleydrum" target="_blank" rel="noopener noreferrer" className="text-gold text-[11px] hover:text-white transition-colors">
               Saurav Chauhan
             </a>
           </p>
