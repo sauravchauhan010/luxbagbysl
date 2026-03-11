@@ -60,9 +60,15 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-12 text-center">
+        <div className="border-t border-gray-800 pt-12 text-center space-y-2">
           <p className="text-[10px] text-gray-500 uppercase tracking-widest">
             © {new Date().getFullYear()} Lux Bag by S and L. All Rights Reserved.
+          </p>
+          <p className="text-[9px] text-gray-700 uppercase tracking-widest">
+            Designed & Developed by{' '}
+            <a href="https://instagram.com/the_volleydrum" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-white transition-colors">
+              Saurav Chauhan
+            </a>
           </p>
         </div>
       </div>
