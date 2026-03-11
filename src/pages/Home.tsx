@@ -14,19 +14,23 @@ const Home = () => {
 
       {/* Hero Section */}
       <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
-        <motion.div
-          initial={{ scale: 1.2, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="absolute inset-0 z-0"
-        >
-          <img
-            src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=2000"
-            alt="Luxury Bag Hero"
+        <div className="absolute inset-0 z-0">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
             className="w-full h-full object-cover brightness-50"
-            referrerPolicy="no-referrer"
-          />
-        </motion.div>
+          >
+            <source src="https://res.cloudinary.com/dvavzjzmp/video/upload/v1773264015/invideo-ai-1080_12s_Luxury_Loop_That_Feels_Premium_2026-03-11_v4tenk.mp4" type="video/mp4" />
+            {/* Fallback image if video fails */}
+            <img
+              src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=2000"
+              alt="Luxury Bag Hero"
+              className="w-full h-full object-cover"
+            />
+          </video>
+        </div>
 
         <div className="relative z-10 text-center text-white px-4 space-y-6">
           <motion.div
