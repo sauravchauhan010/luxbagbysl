@@ -13,7 +13,7 @@ const Footer = () => {
               <span className="text-[10px] uppercase tracking-[0.3em] text-gold">by S & L</span>
             </Link>
             <p className="text-gray-400 text-xs font-light leading-relaxed">
-              Your premier destination for authentic luxury bags in Dubai. Buy, sell, and consign with confidence.
+              Your premier destination for authentic luxury bags in Dubai. Shop with confidence.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="hover:text-gold transition-colors"><Instagram size={18} /></a>
@@ -32,12 +32,12 @@ const Footer = () => {
           </div>
 
           <div className="space-y-6">
-            <h4 className="text-xs uppercase tracking-widest font-bold">Services</h4>
+            <h4 className="text-xs uppercase tracking-widest font-bold">Our Promise</h4>
             <ul className="space-y-4 text-gray-400 text-xs font-light">
-              <li><Link to="/contact" className="hover:text-gold transition-colors">Sell Your Bag</Link></li>
-              <li><Link to="/contact" className="hover:text-gold transition-colors">Consignment</Link></li>
               <li><Link to="/about" className="hover:text-gold transition-colors">Authenticity Guarantee</Link></li>
               <li><Link to="/contact" className="hover:text-gold transition-colors">Inquiry</Link></li>
+              <li><Link to="/shop" className="hover:text-gold transition-colors">New Arrivals</Link></li>
+              <li><Link to="/contact" className="hover:text-gold transition-colors">WhatsApp Us</Link></li>
             </ul>
           </div>
 
