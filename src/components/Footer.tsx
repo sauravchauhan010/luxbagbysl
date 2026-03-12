@@ -16,8 +16,8 @@ const Footer = () => {
               Your premier destination for authentic luxury bags in Dubai. Shop with confidence.
             </p>
             <div className="flex space-x-4">
-              <a href="https://www.instagram.com/luxbagbysandl?igsh=MWIyOWxpOWVhYm5lcQ==" className="hover:text-gold transition-colors"><Instagram size={20} /></a>
-              <a href="https://www.facebook.com/profile.php?id=100083574480279" className="hover:text-gold transition-colors"><Facebook size={20} /></a>
+              <a href="https://www.instagram.com/luxbagbysandl?igsh=MWIyOWxpOWVhYm5lcQ==" target="_blank" className="hover:text-gold transition-colors"><Instagram size={20} /></a>
+              <a href="https://www.facebook.com/profile.php?id=100083574480279" target="_blank" className="hover:text-gold transition-colors"><Facebook size={20} /></a>
             </div>
           </div>
 
