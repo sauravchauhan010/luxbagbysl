@@ -49,7 +49,7 @@ const Navbar = () => {
               }}
             >
               <img
-                src="https://scontent.fdxb3-3.fna.fbcdn.net/v/t39.30808-1/461331705_511393141656498_7949530645421016791_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=107&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=-Ru6uhhmNUkQ7kNvwFjXhVY&_nc_oc=AdnJc5sBNj7HnUwv_aBDluEEVU83ipsFAk7bc1b4TN6w5Ygvm5R9i8OAYjTvptALkkP36JgUVYbj9XyDZl7mkMqu&_nc_zt=24&_nc_ht=scontent.fdxb3-3.fna&_nc_gid=zgRXcOGL4CjHaLBEQpdHeg&_nc_ss=8&oh=00_AfyKqDXsaXU6KdGo6UMJU8pBtGQY7NkJj3QQfIni8Wxokg&oe=69B49233"
+                src="https://res.cloudinary.com/dvavzjzmp/image/upload/v1773258188/461331705_511393141656498_7949530645421016791_n_rzdyhp.jpg"
                 alt="Lux Bag Logo"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 referrerPolicy="no-referrer"
